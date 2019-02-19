@@ -13,7 +13,7 @@ The service consists of 2 applications and a database, all as docker images:
    /markets/ETH-ADA?from=2019-02-19T10:59:00Z&to=2019-02-19T11:01:21Z
 
    response:
-   ```
+```
    [
         {
             "from": "2019-02-19T11:01:14Z",
@@ -29,7 +29,8 @@ The service consists of 2 applications and a database, all as docker images:
         },
         ...
     ]
-  ```
+```
+
 
 Both applications are pointed to the mongodb server by the environment variable `MONGO_ADDRESS`
 
@@ -43,16 +44,11 @@ To test the app, make sure you have pytest and datadiff installed, e.g.:
 `pip install pytest datadiff`
 
 Set the database to acceptance state:
-run: service
-	docker-compose build
-	docker-compose up
-
-test: test-acceptance
-
-test-acceptance: tests/acceptance
-    mongoimport --host localhost --port 5000 \
+```
+   mongoimport --host localhost --port 5000 \
         --db exchange --collection markets --drop \
         --file tests/data/acceptance.json --jsonArray
+```
 
 
 Then run:
