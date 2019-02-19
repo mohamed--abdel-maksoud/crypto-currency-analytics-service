@@ -1,0 +1,33 @@
+version: '3.3'
+services:
+  data_collector:
+    build: './data_collector'
+    environment:
+      - MARKETS=ETH-ADA,USDT-ZRX
+      - MONGO_ADDRESS=mongodb://db:27017
+    volumes:
+      - '.:/go/src/app'
+    depends_on:
+      - 'db'
+  api:
+    build: './service'
+    ports:
+      - '8000:80'
+    environment:
+      - MONGO_ADDRESS=mongodb://db:27017
+    volumes:
+      - '.:/go/src/app'
+    depends_on:
+      - 'db'
+  db:
+    image: 'mongo:latest'
+    ports:
+      - '5000:27017'
+  # TODO nginx reverse proxy
+  #web:
+    #container_name: 'web'
+    #image: 'nginx:latest'
+    #ports:
+      #- '8081:80'
+    #depends_on:
+      #- 'api'
