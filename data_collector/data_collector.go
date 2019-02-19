@@ -12,7 +12,6 @@ import (
 	"github.com/Jeffail/gabs"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/options"
 )
 
 const bittrexUrl string = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
@@ -52,7 +51,7 @@ func main() {
 		marketsMap[market] = true
 	}
 
-	ticker := time.NewTicker(10500 * time.Millisecond)
+	ticker := time.NewTicker(5000 * time.Millisecond)
 
 	go func() {
 		for t := range ticker.C {
@@ -66,8 +65,6 @@ func main() {
 }
 
 func collectData() {
-	updateOpt := options.Update()
-	updateOpt.SetUpsert(true)
 
 	result, err := doGetRequest(bittrexUrl)
 	if err != nil {
@@ -98,15 +95,15 @@ func collectData() {
 		log.Printf("%s: [%0.6f - %0.6f] x %0.6f\n", name, low, high, volume)
 
 		newDoc := bson.D{
+			{"market", name},
 			{"low", low},
 			{"high", high},
 			{"volume", volume},
+			{"time", time.Now().Unix()},
 		}
-		_, err := mongoCollection.UpdateOne(
+		_, err := mongoCollection.InsertOne(
 			context.Background(),
-			bson.D{{"_id", name}},
-			bson.D{{"$set", newDoc}},
-			updateOpt,
+			newDoc,
 		)
 
 		if err != nil {
